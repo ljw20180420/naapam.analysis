@@ -1,3 +1,13 @@
+#' Aggregate and average
+#'
+#' Aggregate y over x. Then take the average over all references (barcodes). The result is saved as ggplot geom_col.
+#'
+#' @param df the tibble with indel information
+#' @return the invisible filename from ggsave
+#' @export
+#'
+#' @examples
+#' df <- agg_y_over_x_and_avg_over_ref_id(df)
 agg_y_over_x_and_avg_over_ref_id <- function(df, x, y, filename) {
   df <- df %>%
     tidyr::pivot_wider(
@@ -26,5 +36,5 @@ agg_y_over_x_and_avg_over_ref_id <- function(df, x, y, filename) {
       y = y,
     )
 
-  ggplot2::ggsave(filename, ggfig)
+  invisible(ggplot2::ggsave(filename, ggfig))
 }
