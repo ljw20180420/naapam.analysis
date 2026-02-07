@@ -18,7 +18,7 @@
 #' ref_start2 = 61
 #' cut1 <- 50
 #' cut2 <- 60
-#' mh_seq <- get_micro_homology(ref_end1, ref_start2, cut1, cut2, ref1, ref2)
+#' mh <- get_micro_homology(ref_end1, ref_start2, cut1, cut2, ref1, ref2)
 get_micro_homology <- function(ref_end1, ref_start2, cut1, cut2, ref1, ref2) {
   ref1 <- stringr::str_split_1(ref1, "")
   ref2 <- stringr::str_split_1(ref2, "")

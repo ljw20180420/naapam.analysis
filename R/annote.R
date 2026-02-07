@@ -1,40 +1,3 @@
-#' Read the finally output of the naapam package
-#'
-#' The pip package naapam output a csv file with mutation information parsed by the bioconda package rearr. This function read this file and select inportant columns.
-#'
-#' @param filename the full path to the csv file
-#' @return a tibble with selected columns
-#' @export
-#'
-#' @examples
-#' df <- read_treat(filename)
-read_treat <- function(filename) {
-  # coltypes = collumn types 数（i），name列为字符串（c），age列也为整数（i），date列为日期（d）。
-  df <- readr::read_csv(
-    file = filename,
-    col_types = "iiiicidclciciiiddddicc",
-    na = c("NA")
-  ) %>%
-    dplyr::select(
-      ref_id,
-      cut1,
-      cut2,
-      ref_end1,
-      random_insertion,
-      ref_start2,
-      count,
-      stem,
-      legal,
-      freq_mut_kim,
-      freq_kim,
-      barcode_id,
-      barcode,
-      sgRNA
-    ) %>%
-    dplyr::filter(legal) %>%
-    dplyr::select(-legal)
-}
-
 #' Annote binary indicator of indels
 #'
 #' Annote whether up/down-stream indels actually happen.
@@ -59,9 +22,10 @@ annote_indicator <- function(df) {
     )
 }
 
-#' Infer indel type
+#' Annote indel type
 #'
-#' Infer indel type (insertion, deletion, indel, wt) and extended indel type (wt, deletion, templated, random, temran, temdel, randel, full) from binary indel indicators.
+#' Annote indel type (insertion, deletion, indel, wt).
+#' Annote extended indel type (wt, deletion, templated, random, temran, temdel, randel, full).
 #'
 #' @param df the tibble with binary indel inidicator information
 #' @return the tibble with annoted indel type information
@@ -121,12 +85,9 @@ annote_indel_size <- function(df) {
     dplyr::mutate(
       up_size = ref_end1 - cut1,
       down_size = cut2 - ref_start2,
-      del_size = dplyr::case_when(
-        up_del & down_del ~ up_size + down_size,
-        up_del & !down_del ~ up_size,
-        !up_del & down_del ~ down_size,
-        .default = 0
-      ),
+      up_del_size = ifelse(up_del, up_size, 0),
+      down_del_size = ifelse(down_del, down_size, 0),
+      del_size = up_del_size + down_del_size,
       templated_ins_size = dplyr::case_when(
         down_tem ~ down_size,
         .default = 0
@@ -135,6 +96,74 @@ annote_indel_size <- function(df) {
       ins_size = templated_ins_size + random_ins_size
     )
 }
+
+#' Annote deletion type
+#'
+#' Annote deletion type (MMEJ, unilateral_top, unilateral_bottom, medial, no_deletion).
+#' Annote extended deletion type (MMEJ_noran, unilateral_top_noran, unilateral_bottom_noran, medial_noran, MMEJ_ran, unilateral_top_ran, unilateral_bottom_ran, medial_ran, no_deletion).
+#'
+#' @param df the tibble with binary indel inidicator information and micro-homology sequence
+#' @param mh_thres the maximal mh length considered as non-micro-homology
+#' @return the tibble with annoted deletion type information
+#' @export
+#'
+#' @examples
+#' df <- annote_indel_type(df)
+annote_deletion_type <- function(df, mh_thres) {
+  df <- df %>%
+    dplyr::mutate(
+      mh_len = stringr::str_length(mh),
+      "deletion_type_{mh_thres}" := factor(
+        dplyr::case_when(
+          del & mh_len > mh_thres ~ "MMEJ",
+          del &
+            mh_len <= mh_thres &
+            !up_del &
+            down_del ~ "unilateral_top",
+          del &
+            mh_len <= mh_thres &
+            up_del &
+            !down_del ~ "unilateral_bottom",
+          del & mh_len <= mh_thres & up_del & down_del ~ "medial",
+          .default = "no_deletion"
+        )
+      ),
+      "deletion_type_ex_{mh_thres}" := factor(
+        dplyr::case_when(
+          del & !ran_ins & mh_len > mh_thres ~ "MMEJ_noran",
+          del &
+            !ran_ins &
+            mh_len <= mh_thres &
+            !up_del &
+            down_del ~ "unilateral_top_noran",
+          del &
+            !ran_ins &
+            mh_len <= mh_thres &
+            up_del &
+            !down_del ~ "unilateral_bottom_noran",
+          del &
+            !ran_ins &
+            mh_len <= mh_thres &
+            up_del &
+            down_del ~ "medial_noran",
+          del & ran_ins & mh_len > mh_thres ~ "MMEJ_ran",
+          del &
+            ran_ins &
+            mh_len <= mh_thres &
+            !up_del &
+            down_del ~ "unilateral_top_ran",
+          del &
+            ran_ins &
+            mh_len <= mh_thres &
+            up_del &
+            !down_del ~ "unilateral_bottom_ran",
+          del & ran_ins & mh_len <= mh_thres & up_del & down_del ~ "medial_ran",
+          .default = "no_deletion"
+        )
+      )
+    )
+}
+
 
 #' Annote indel information
 #'
@@ -150,6 +179,8 @@ annote_treat <- function(df) {
   df <- annote_indicator(df)
   df <- annote_indel_type(df)
   df <- annote_indel_size(df)
+  df <- annote_deletion_type(df, mh_thres = 0)
+  df <- annote_deletion_type(df, mh_thres = 1)
 }
 
 

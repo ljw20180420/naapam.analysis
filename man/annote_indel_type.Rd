@@ -2,7 +2,7 @@
 % Please edit documentation in R/annote.R
 \name{annote_indel_type}
 \alias{annote_indel_type}
-\title{Infer indel type}
+\title{Annote indel type}
 \usage{
 annote_indel_type(df)
 }
@@ -13,7 +13,8 @@ annote_indel_type(df)
 the tibble with annoted indel type information
 }
 \description{
-Infer indel type (insertion, deletion, indel, wt) and extended indel type (wt, deletion, templated, random, temran, temdel, randel, full) from binary indel indicators.
+Annote indel type (insertion, deletion, indel, wt).
+Annote extended indel type (wt, deletion, templated, random, temran, temdel, randel, full).
 }
 \examples{
 df <- annote_indel_type(df)
