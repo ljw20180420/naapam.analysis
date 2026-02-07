@@ -34,7 +34,10 @@ sgRNA_pivot <- function(df, name, value) {
 #' @examples
 #' df <- sgRNA_summarise(df, indel_type, count)
 sgRNA_summarise <- function(df, name, value) {
-  name_type <- df %>% select({{ name }}) %>% purrr::map_chr(class) %>% .[1]
+  name_type <- df %>%
+    dplyr::select({{ name }}) %>%
+    purrr::map_chr(class) %>%
+    .[1]
   df <- df %>%
     sgRNA_pivot(
       name = {{ name }},
@@ -46,15 +49,18 @@ sgRNA_summarise <- function(df, name, value) {
       names_to = rlang::as_name(rlang::ensym(name)),
       values_to = rlang::as_name(rlang::ensym(value))
     )
-  df <- dplyr::case_when(
-    name_type == "numeric" ~ df %>%
+
+  if (name_type == "numeric") {
+    df <- df %>%
       dplyr::mutate(
         "{{name}}" := as.integer({{ name }})
-      ),
-    x_type == "factor" ~ df %>%
+      )
+  } else if (name_type == "factor") {
+    df <- df %>%
       dplyr::mutate(
-        "{{name}}" := as.integer({{ name }})
-      ),
-    .default = df
-  )
+        "{{name}}" := as.factor({{ name }})
+      )
+  }
+
+  return(df)
 }

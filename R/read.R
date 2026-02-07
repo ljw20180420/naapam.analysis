@@ -12,7 +12,7 @@ read_treat <- function(filename) {
   # coltypes = collumn types 数（i），name列为字符串（c），age列也为整数（i），date列为日期（d）。
   df <- readr::read_csv(
     file = filename,
-    col_types = "iiiicidclciciiiddddicccc",
+    col_types = "iiiicidcllciciiiddddicccc",
     na = c("NA")
   ) %>%
     dplyr::select(
@@ -24,6 +24,7 @@ read_treat <- function(filename) {
       ref_start2,
       count,
       stem,
+      tem_indicator,
       legal,
       freq_mut_kim,
       freq_kim,
