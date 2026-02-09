@@ -50,10 +50,10 @@ sgRNA_summarise <- function(df, name, value) {
       values_to = rlang::as_name(rlang::ensym(value))
     )
 
-  if (name_type == "numeric") {
+  if (name_type == "numeric" || name_type == "integer") {
     df <- df %>%
       dplyr::mutate(
-        "{{name}}" := as.integer({{ name }})
+        "{{name}}" := as.numeric({{ name }})
       )
   } else if (name_type == "factor") {
     df <- df %>%
