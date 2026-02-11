@@ -1,6 +1,6 @@
 {
   df <- read_treat(
-    filename = "/home/ljw/sdb1/naapam/analyze/treat/annote/treat.csv"
+    filename = "test/treat.csv"
   )
   # df <- df %>%
   #   dplyr::rowwise() %>%
