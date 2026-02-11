@@ -57,14 +57,14 @@ annote_indel_type <- function(df) {
           .default = "wt"
         ),
         levels = c(
-          "wt",
-          "deletion",
-          "templated",
-          "random",
-          "temran",
+          "full",
           "temdel",
+          "temran",
           "randel",
-          "full"
+          "templated",
+          "deletion",
+          "random",
+          "wt"
         )
       )
     )
@@ -125,7 +125,16 @@ annote_deletion_type <- function(df, mh_thres) {
             up_del &
             !down_del ~ "unilateral_bottom",
           del & mh_len <= mh_thres & up_del & down_del ~ "medial",
-          .default = "no_deletion"
+          !del & ins ~ "insertion",
+          .default = "wt"
+        ),
+        levels = c(
+          "MMEJ",
+          "unilateral_top",
+          "unilateral_bottom",
+          "medial",
+          "insertion",
+          "wt"
         )
       ),
       "deletion_type_ex_{mh_thres}" := factor(
@@ -158,7 +167,20 @@ annote_deletion_type <- function(df, mh_thres) {
             up_del &
             !down_del ~ "unilateral_bottom_ran",
           del & ran_ins & mh_len <= mh_thres & up_del & down_del ~ "medial_ran",
-          .default = "no_deletion"
+          !del & ins ~ "insertion",
+          .default = "wt"
+        ),
+        levels = c(
+          "MMEJ_noran",
+          "unilateral_top_noran",
+          "unilateral_bottom_noran",
+          "medial_noran",
+          "MMEJ_ran",
+          "unilateral_top_ran",
+          "unilateral_bottom_ran",
+          "medial_ran",
+          "insertion",
+          "wt"
         )
       )
     )
