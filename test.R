@@ -1,19 +1,13 @@
 {
-  df <- read_treat(
+  df_treat <- read_treat(
     filename = "test/treat.csv"
   )
-  # df <- df %>%
-  #   dplyr::rowwise() %>%
-  #   dplyr::mutate(
-  #     mh = get_micro_homology(ref_end1, ref_start2, cut1, cut2, ref1, ref2)
-  #   )
-  # df <- annote_treat(df)
+  df_control <- read_control(
+    filename = "test/control.csv"
+  )
 
-  df <- df %>%
-    annote_indicator() %>%
-    annote_indel_type() %>%
-    annote_indel_size() %>%
-    filter_treat()
+  df_treat <- annote_all(df_treat)
+  df_control <- annote_all(df_control)
 
   df %>%
     dplyr::filter(tem_indicator) %>%

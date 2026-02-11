@@ -174,8 +174,8 @@ annote_deletion_type <- function(df, mh_thres) {
 #' @export
 #'
 #' @examples
-#' df <- annote_treat(df)
-annote_treat <- function(df) {
+#' df <- annote_all(df)
+annote_all <- function(df) {
   df <- annote_indicator(df)
   df <- annote_indel_type(df)
   df <- annote_indel_size(df)

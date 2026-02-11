@@ -2,19 +2,19 @@
 % Please edit documentation in R/read.R
 \name{read_treat}
 \alias{read_treat}
-\title{Read the finally output of the naapam package}
+\title{Read the finally treat output of the naapam package}
 \usage{
 read_treat(filename)
 }
 \arguments{
-\item{filename}{the full path to the csv file}
+\item{filename}{the full path to the csv file of treat}
 }
 \value{
 a tibble with selected columns
 }
 \description{
-The pip package naapam output a csv file with mutation information parsed by the bioconda package rearr. This function read this file and select inportant columns.
+The pip package naapam output a csv file of treat with mutation information parsed by the bioconda package rearr. The columns are ref_id (i), cut1 (i), cut2 (i), ref_end1 (i), random_insertion (c), ref_start2 (i), count(d), stem (c), tem_indicator (l), legal (l), chip (c), time (i), wt (c), count_ctl (i), count_wt_ctl (i), count_tot_ctl (i), count_kim (d), count_tot_kim (d), freq_mut_kim (d), barcode_id (i), barcode (c), sgRNA (c), ref1 (c), ref2 (c), mh (c). This function read this file and select inportant columns.
 }
 \examples{
-df <- read_treat(filename)
+df_treat <- read_treat(filename)
 }
