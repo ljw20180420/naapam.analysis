@@ -70,6 +70,7 @@ annote_indel_type <- function(df) {
     )
 }
 
+
 #' Annote indel size
 #'
 #' Annote indel size to the input tibble (including up/down-stream indel size, deletion size, templated insertion size, random insertion size, insertion size).
@@ -80,11 +81,22 @@ annote_indel_type <- function(df) {
 #'
 #' @examples
 #' df <- annote_indel_size(df)
-annote_indel_size <- function(df) {
+annote_indel_size <- function(df, size_limit) {
   df <- df %>%
     dplyr::mutate(
-      up_size = ref_end1 - cut1,
-      down_size = cut2 - ref_start2,
+      up_size = factor(
+        pmin(pmax(ref_end1 - cut1, -size_limit - 1), size_limit + 1),
+        levels = seq(-size_limit - 1, size_limit + 1),
+        ordered = TRUE
+      ),
+      down_size = factor(
+        pmin(
+          pmax(cut2 - ref_start2, -size_limit - 1),
+          size_limit + 1
+        ),
+        levels = seq(-size_limit - 1, size_limit + 1),
+        ordered = TRUE
+      ),
       up_del_size = ifelse(up_del, up_size, 0),
       down_del_size = ifelse(down_del, down_size, 0),
       del_size = up_del_size + down_del_size,
